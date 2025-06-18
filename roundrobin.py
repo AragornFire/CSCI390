@@ -73,6 +73,6 @@ while True:
             wtimes[proc["pid"]] += 1
 
 #print(finallst)
-print(' -> '.join(genslices(finallst)))
-print(avg(ttimes.values()))
-print(avg(wtimes.values()))
+print("Execution Sequence:", ' -> '.join(genslices(finallst)))
+print("Average Waiting Time:", avg(ttimes.values()))
+print("Average Turnaround Time:", avg(wtimes.values()))
