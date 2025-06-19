@@ -39,11 +39,12 @@ while True:
             currprocs.append(p)
             ttimes[p["pid"]] = 0
             wtimes[p["pid"]] = 0
-    # Process death
-    if currproc and currproc["burst_time"] == 0:
-        currprocs.pop(0)
-        currproc = None
-        timeexpd = 0
+    # For waittime and turnaround
+    for proc in currprocs:
+        if proc["arrival_time"] < currtime:
+            ttimes[proc["pid"]] += 1
+            if proc != currproc:
+                wtimes[proc["pid"]] += 1
     # Check if Finnish
     if not currprocs and all(p["burst_time"] == 0 for p in Processes):
         break
@@ -51,11 +52,17 @@ while True:
     if currproc is None and currprocs:
         currproc = currprocs[0]
         timeexpd = 0
-    # Process finished
+    # Process continues
     if currproc and currproc["burst_time"] > 0:
         finallst.append(currproc['pid'])
+        #print(currproc['pid'], ttimes, [i['pid'] for i in currprocs])
         currproc["burst_time"] -= 1
         timeexpd += 1
+    # Process death
+    if currproc and currproc["burst_time"] == 0:
+        currprocs.pop(0)
+        currproc = None
+        timeexpd = 0
     # Process time's up
     if currproc and timeexpd == time_quantum:
         if currproc["burst_time"] > 0:
@@ -67,12 +74,11 @@ while True:
         timeexpd = 0
     # Time flies when you throw it
     currtime += 1
-    for proc in currprocs:
-        ttimes[proc["pid"]] += 1
-        if proc != currproc:
-            wtimes[proc["pid"]] += 1
+    #print([i['pid'] for i in currprocs])
 
 #print(finallst)
 print("Execution Sequence:", ' -> '.join(genslices(finallst)))
+#print("TTimes:", ttimes)
+#print("WTimes:", wtimes)
 print("Average Waiting Time:", avg(ttimes.values()))
 print("Average Turnaround Time:", avg(wtimes.values()))
